@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 from fractions import Fraction
 
 # input.txt를 읽고, 유효한 줄을 반환하는 함수 구현
@@ -21,7 +22,7 @@ def read_line(file):
     return line
 
 
-# cofactor expansiond으로 행렬식을 구하는 함수 (1행 전개로 구현)
+# cofactor expansion으로 행렬식을 구하는 함수 (1행 전개로 구현)
 def determinant_cofactor(matrix):
 
     # determinant값 저장을 위해 초기화
@@ -52,6 +53,7 @@ def determinant_cofactor(matrix):
             output_file = open("output.txt",'a')
             output_file.write("element = " + str(a) + "\n")
             output_file.close()
+
             write_matrix_1(minor)
 
             #sign
@@ -68,16 +70,19 @@ def determinant_cofactor(matrix):
 
 # 가우스 소거법으로 행렬식을 구하는 함수
 def determinant_gauss(matrix):
-    for i in range(len(matrix)-1): # 대각 원소    
-        for r in range(len(matrix)-i-1): # [0,'0']이면 행 4번 반복
-            x = - matrix[i+1+r][i] / matrix[i][i]
+    # matrix복사
+    matrix_copy = copy.deepcopy(matrix)
+    
+    for i in range(len(matrix_copy)-1): # 대각 원소    
+        for r in range(len(matrix_copy)-i-1): # [0,'0']이면 행 4번 반복
+            x = - matrix_copy[i+1+r][i] / matrix_copy[i][i]
 
-            for c in range(len(matrix)-i): # ['0',0]이면 열 5번 반복
-                matrix[i+1+r][i+c] += (matrix[i][i+c] * x) # 하나의 열 변환
+            for c in range(len(matrix_copy)-i): # ['0',0]이면 열 5번 반복
+                matrix_copy[i+1+r][i+c] += (matrix_copy[i][i+c] * x) # 하나의 열 변환
             
             # output.txt파일에 쓰기
             output_file = open("output.txt",'a')
-            write_matrix_2(matrix)
+            write_matrix_2(matrix_copy)
 
     # determinant값 저장을 위해 초기화
     det = 1 
@@ -86,24 +91,12 @@ def determinant_gauss(matrix):
     output_file = open("output.txt",'a')
     output_file.write("det(A) = ")
 
-    for j in range(len(matrix)):
-        output_file.write(str(Fraction(matrix[j][j]).limit_denominator(100)) + ' x ')
-        det *= matrix[j][j]
+    for j in range(len(matrix_copy)):
+        output_file.write(str(Fraction(matrix_copy[j][j]).limit_denominator(100)) + ' x ')
+        det *= matrix_copy[j][j]
 
     output_file.write("= " + str(det) + "\n")
     output_file.close()
-
-
-# output.txt파일 초기화 함수
-def output_txt_reset():
-    # output.txt파일 열기
-    file = open('output.txt','w')
-
-    # 기존에 적혀있던 내용을 초기화
-    file.write('')
-
-    # 파일 닫기
-    file.close()
 
 
 # matrix를 output.txt에 쓰는 함수1: cofactor expansion을 사용하는 경우
@@ -130,6 +123,19 @@ def write_matrix_2(matrix):
 
     output_file.write("\n")
     output_file.close()
+
+
+# output.txt파일 초기화 함수
+def output_txt_reset():
+    # output.txt파일 열기
+    file = open('output.txt','w')
+
+    # 기존에 적혀있던 내용을 초기화
+    file.write('')
+
+    # 파일 닫기
+    file.close()
+
 
 
 # input.txt 읽기
@@ -172,14 +178,15 @@ def read_file():
                 if line.startswith('cofactor expansion'):
                     # output.txt파일에 쓰기
                     output_file = open("output.txt",'a')
-                    output_file.write("1. cofactor expansion \n\n")
+                    output_file.write("\n************************ \n")
+                    output_file.write("** cofactor expansion ** \n")
+                    output_file.write("************************ \n\n")
                     output_file.close()
                     write_matrix_1(matrix)
 
-                    # determinant 구하기
+                    # determinant 구하고 파일에 쓰기
                     det = determinant_cofactor(matrix)
 
-                    # output.txt파일에 쓰기
                     output_file = open("output.txt",'a')
                     output_file.write("det(A) = " + str(det) + "\n")
                     output_file.close()
@@ -188,8 +195,9 @@ def read_file():
                 else:
                     # output.txt파일에 쓰기
                     output_file = open("output.txt",'a')
-                    output_file.write("\n-------------------------------------\n\n")
-                    output_file.write("2. properties of the determinant \n\n")
+                    output_file.write("\n *************************************** \n")
+                    output_file.write(" **   properties of the determinant   ** \n")
+                    output_file.write(" *************************************** \n\n")
                     output_file.close()
                     write_matrix_2(matrix)
 

@@ -7,7 +7,7 @@ A 5 5
 3 2 1 5 4
 
 연산 방법: 2
-cofactor expansion
 properties of the determinant
+cofactor expansion
 
 end
